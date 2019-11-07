@@ -45,6 +45,7 @@ PS_INPUT VS( VS_INPUT input )
   output.Pos = mul(input.Pos , World);
   output.Pos = mul(output.Pos , View);
   output.Pos = mul(output.Pos , Projection);
+    // apply dot product 
   output.Norm = input.Norm;
   output.Tex = input.Tex;
 
