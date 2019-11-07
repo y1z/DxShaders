@@ -19,6 +19,16 @@ cbuffer cbChangesEveryFrame : register( b2 )
   float4 vMeshColor;
 };
 
+cbuffer LightData : register(b3)
+{
+    float4 c_AmbienColor;
+    float4 c_LightColor;
+    float3 c_LightDir; 
+    float3 c_LightPos;
+    float c_LightmodelIntensity;
+    float c_LightAmbienIntensity;
+};
+
 
 //--------------------------------------------------------------------------------------
 struct VS_INPUT
@@ -45,8 +55,7 @@ PS_INPUT VS( VS_INPUT input )
   output.Pos = mul(input.Pos , World);
   output.Pos = mul(output.Pos , View);
   output.Pos = mul(output.Pos , Projection);
-    // apply dot product 
-  output.Norm = input.Norm;
+  output.Norm = mul(normalize(float4(input.Norm.xyz,0.0f)),World);
   output.Tex = input.Tex;
 
     
@@ -59,5 +68,14 @@ PS_INPUT VS( VS_INPUT input )
 //--------------------------------------------------------------------------------------
 float4 PS( PS_INPUT input ) : SV_Target
 {
-  return txDiffuse.Sample(samLinear , input.Tex) * vMeshColor;
+    // find out which pixels are being hit by 
+    // the light 
+   float IdN = clamp(dot(-c_LightDir, input.Norm),0.0f,1.0f);
+   // color the pixels that are bing hit by the light  
+   // * IdN; /* txDiffuse.Sample(samLinear , input.Tex)  ; 
+ // vMeshColor * IdN;
+  float4 diffuse = txDiffuse.Sample(samLinear,input.Tex) * saturate( vMeshColor * c_LightColor) * IdN;
+   
+  //diffuse = diffuse * IdN;
+  return diffuse;
 }
