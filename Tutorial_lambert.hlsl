@@ -58,8 +58,8 @@ PS_INPUT VS( VS_INPUT input )
   output.Pos = mul(input.Pos , World);
   output.Pos = mul(output.Pos , View);
   output.Pos = mul(output.Pos , Projection);
-  //output.Norm = normalize(mul(float4(input.Norm.xyz,0.0f),World));
-  output.Tex = input.Tex;
+  output.Norm = normalize(mul(float4(input.Norm.xyz,0.0f),World));
+ // output.Tex = input.Tex;
 	output.Norm = input.Norm;
     
   return output;
