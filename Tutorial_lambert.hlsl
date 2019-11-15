@@ -23,10 +23,13 @@ cbuffer LightData : register(b3)
 {
     float4 c_AmbienColor;
     float4 c_LightColor;
-    float3 c_LightDir; 
-    float3 c_LightPos;
-    float c_LightmodelIntensity;
-    float c_LightAmbienIntensity;
+    float4 c_LightPos;
+
+    float4 c_LightDir; 
+
+    //float c_LightModelIntensity;
+    //float c_LightAmbienIntensity;
+		//float Padding;
 };
 
 
@@ -55,9 +58,9 @@ PS_INPUT VS( VS_INPUT input )
   output.Pos = mul(input.Pos , World);
   output.Pos = mul(output.Pos , View);
   output.Pos = mul(output.Pos , Projection);
-  output.Norm = mul(normalize(float4(input.Norm.xyz,0.0f)),World);
+  //output.Norm = normalize(mul(float4(input.Norm.xyz,0.0f),World));
   output.Tex = input.Tex;
-
+	output.Norm = input.Norm;
     
   return output;
 }
@@ -70,10 +73,9 @@ float4 PS( PS_INPUT input ) : SV_Target
 {
     // find out which pixels are being hit by 
     // the light 
-   float IdN = clamp(dot(-c_LightDir, input.Norm),0.0f,1.0f);
+   float IdN = clamp(dot(-c_LightDir.xyz, input.Norm),0.0f,1.0f);
    // color the pixels that are bing hit by the light  
    // * IdN; /* txDiffuse.Sample(samLinear , input.Tex)  ; 
- // vMeshColor * IdN;
   float4 diffuse = txDiffuse.Sample(samLinear,input.Tex) * saturate( vMeshColor * c_LightColor) * IdN;
    
   //diffuse = diffuse * IdN;
