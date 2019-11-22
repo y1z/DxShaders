@@ -2,7 +2,6 @@
 #define VERTEX_LIGHT 1
 #define DIR_LIGHT 1
 
-
 Texture2D txDiffuse : register( t0 );
 SamplerState samLinear : register( s0 );
 
@@ -26,14 +25,15 @@ cbuffer cbChangesEveryFrame : register( b2 )
 cbuffer LightData : register(b3)
 {
     float4 c_AmbienColor;
-    float4 c_LightColor;
+    float4 c_diffuseColor;
+    float4 c_specularColor;
+
     float4 c_LightPos;
+    float3 c_LightDir; 
 
-    float4 c_LightDir; 
-
+    float c_LightSpecularIntensity;
     float c_LightModelIntensity;
     float c_LightAmbienIntensity;
-		float2 _Padding_;
 };
 
 
@@ -59,12 +59,15 @@ struct PS_INPUT
 PS_INPUT VS( VS_INPUT input )
 {
   PS_INPUT output = (PS_INPUT) 0;
+  /*move the vertex to world space */
   output.Pos = mul(input.Pos , World);
+
+  /*move the vertex to view space */
   output.Pos = mul(output.Pos , View);
   output.Pos = mul(output.Pos , Projection);
+  /*move normal with the model */
   output.Norm = normalize(mul(float4(input.Norm.xyz,0.0f),World));
- // output.Tex = input.Tex;
-	//output.Norm = input.Norm;
+  output.Tex = input.Tex;
     
   return output;
 }
@@ -78,10 +81,10 @@ float4 PS( PS_INPUT input ) : SV_Target
     // find out which pixels are being hit by 
     // the light 
    float IdN = clamp(dot(-c_LightDir.xyz, input.Norm),0.0f,1.0f);
+
    // color the pixels that are bing hit by the light  
    // * IdN; /* txDiffuse.Sample(samLinear , input.Tex)  ; 
-   float4 diffuse = txDiffuse.Sample(samLinear,input.Tex) * saturate( vMeshColor * c_LightColor) * IdN;
-   
-  //diffuse = diffuse * IdN;
+   float4 diffuse = saturate( txDiffuse.Sample(samLinear,input.Tex) * c_diffuseColor) * IdN;
+
   return diffuse;
 }

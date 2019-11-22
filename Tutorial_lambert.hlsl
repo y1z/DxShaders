@@ -23,11 +23,13 @@ cbuffer cbChangesEveryFrame : register( b2 )
 cbuffer LightData : register(b3)
 {
     float4 c_AmbienColor;
-    float4 c_LightColor;
+    float4 c_diffuseColor;
+    float4 c_specularColor;
 
     float4 c_LightPos;
     float3 c_LightDir; 
 
+    float c_LightSpecularIntensity;
     float c_LightModelIntensity;
     float c_LightAmbienIntensity;
 };
@@ -80,7 +82,7 @@ float4 PS( PS_INPUT input ) : SV_Target
 
    // color the pixels that are bing hit by the light  
    // * IdN; /* txDiffuse.Sample(samLinear , input.Tex)  ; 
-   float4 diffuse =  saturate( txDiffuse.Sample(samLinear,input.Tex) * c_LightColor) * IdN;
-   
+   float4 diffuse = saturate( txDiffuse.Sample(samLinear,input.Tex) * c_diffuseColor) * IdN;
+
   return diffuse;
 }
