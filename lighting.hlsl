@@ -1,3 +1,6 @@
+#define BLIN 1
+#define VERTEX_LIGHT 1
+#define DIR_LIGHT 1
 
 
 Texture2D txDiffuse : register( t0 );
